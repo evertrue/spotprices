@@ -2,4 +2,4 @@
 
 require 'spotprices'
 
-Spotprices.new.run
+EverTools::SpotPrices.new.run
