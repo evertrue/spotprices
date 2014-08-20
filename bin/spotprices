@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'spotprices'
+
+Spotprices.new.run
