@@ -10,27 +10,50 @@ module EverTools
 
     def prices
       p = connection.describe_spot_price_history.body['spotPriceHistorySet']
-      p = p.select do |s|
-        s['productDescription'] == 'Linux/UNIX (Amazon VPC)' &&
-          s['availabilityZone'] == 'us-east-1c'
-      end
       output = []
-      p.map { |s| s['instanceType'] }.uniq.each do |s|
-        output << p.select { |spot| spot['instanceType'] == s }.first
+      p.map { |s| s['productDescription'] }.uniq.each do |s_d|
+        p.map { |s| s['instanceType'] }.uniq.each do |s_i|
+          output << p.select { |spot|
+            spot['instanceType'] == s_i &&
+              spot['productDescription'] == s_d
+          }.first
+        end
       end
+      output.delete(nil)
       output
     end
 
     def display_header
-      printf("%-11s %8s\n", 'Flavor', 'Price')
-      printf("%s\n", '-' * 20)
+      output_header = format(
+        '%-11s %-25s %8s',
+        'Flavor',
+        'Description',
+        'Price'
+      )
+      puts output_header
+      puts '-' * output_header.length
+    end
+
+    def list
+      display_header
+      prices.sort { |a, b|
+        if a['productDescription'] == b['productDescription']
+          a['instanceType'] <=> b['instanceType']
+        else
+          a['productDescription'] <=> b['productDescription']
+        end
+      }.each do |s|
+        printf(
+          "%-11s %-25s %8s\n",
+          s['instanceType'],
+          s['productDescription'],
+          s['spotPrice']
+        )
+      end
     end
 
     def run
-      display_header
-      prices.sort_by { |s| s['instanceType'] }.each do |s|
-        printf("%-11s %8s\n", s['instanceType'], s['spotPrice'])
-      end
+      list if ARGV.empty?
     end
   end
 end
