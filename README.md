@@ -18,7 +18,9 @@ Or install it yourself as:
 
 ## Usage
 
-Just run it: `spotprices`
+For a full list of the most recent spot prices for every instance type, just run it plain: `spotprices`
+
+Or run it with a flavor to see the spot price availability (and history, complete with high, low, and average price): `spotprices c3.large`
 
 ## Contributing
 
