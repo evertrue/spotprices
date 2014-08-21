@@ -28,6 +28,7 @@ module EverTools
 
   class SpotPrices
     require 'fog'
+    require 'awscosts'
     require 'colorize'
 
     def connection
@@ -40,6 +41,20 @@ module EverTools
 
     def prices
       @prices ||= connection.describe_spot_price_history.body['spotPriceHistorySet']
+    end
+
+    def awscosts
+      @awscosts ||= AWSCosts.region('us-east-1').ec2
+    end
+
+    def on_demand(type)
+      if type =~ /linux/i
+        awscosts.on_demand(:linux).price
+      elsif type =~ /windows/i
+        awscosts.on_demand(:windows).price
+      else
+        fail "Unrecognized product: #{type}"
+      end
     end
 
     def filtered_prices
@@ -120,7 +135,11 @@ module EverTools
     def one_type
       keyout 'Instance Type', @flavor
       products.each do |product|
-        keyout 'Product', product, 2
+        keyout(
+          'Product',
+          "#{product} OD: #{on_demand(product)[@flavor]}",
+          2
+        )
         zones.each do |zone|
           fp = FlavorPrice.new
           fp.prices = prices_by_time(@flavor, zone, product)

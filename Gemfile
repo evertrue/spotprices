@@ -8,5 +8,6 @@ gem 'fog' '~> 1.20'
 
 group :development do
   gem 'gemfury', '> 0.4'
+  gem 'awscosts'
   gem 'colorize'
 end
