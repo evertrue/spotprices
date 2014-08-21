@@ -2,4 +2,5 @@
 
 require 'spotprices'
 
-EverTools::SpotPrices.new.run
+sp = EverTools::SpotPrices.new(ARGV)
+sp.run
